@@ -1,6 +1,6 @@
 # Fondateur @ [synergieloc.fr](https://synergieloc.fr) | Outils IA pour l'immobilier français
 
-**MCP Server • n8n • Automatisation légale (IRL, charges, quittances)**
+**MCP Server • n8n • Automatisation gérance & syndic** (IRL, charges, quittances, relances, CRG, EDL, banque, fiscal, appels de fonds…)
 
 Programme de démarchage Synergieloc : un **orchestrateur** délègue à 9 sous-agents.
 L'orchestrateur ne fait jamais le travail (pyramide n8n).
