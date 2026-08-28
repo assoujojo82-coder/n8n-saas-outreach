@@ -1,0 +1,11 @@
+{
+  "canal": "x",
+  "api": "v2",
+  "env": {
+    "X_BEARER_TOKEN": "secret serveur",
+    "X_API_KEY": "",
+    "X_API_SECRET": ""
+  },
+  "cta_autorise": ["https://synergieloc.fr", "https://checkwebs.fr", "https://languals.fr"],
+  "interdit": ["spam threads", "conformité en un clic"]
+}

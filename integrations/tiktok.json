@@ -1,0 +1,12 @@
+{
+  "canal": "tiktok",
+  "compte": "@synergieloc",
+  "kit": "docs/tiktok/KIT.md",
+  "format": "9:16",
+  "duree_s": [15, 35],
+  "hashtag": "#Synergieloc",
+  "env": {
+    "TIKTOK_ACCESS_TOKEN": "secret serveur"
+  },
+  "interdit": ["publier depuis un compte perso", "mentionner des comptes hors TikTok"]
+}

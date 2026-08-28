@@ -1,0 +1,12 @@
+{
+  "canal": "linkedin",
+  "type": "page_entreprise",
+  "env": {
+    "LINKEDIN_ACCESS_TOKEN": "secret serveur",
+    "LINKEDIN_ORG_URN": ""
+  },
+  "kit": "docs/linkedin-kit.md",
+  "visuels": "docs/linkedin/visuels/",
+  "horaires": "semaine 8h-9h ou 12h-13h Europe/Paris",
+  "interdit": ["scraping profils", "InMail de masse", "conformité magique"]
+}

@@ -1,0 +1,14 @@
+{
+  "canal": "meta",
+  "marques": ["checkwebs", "languals", "synergieloc"],
+  "env": {
+    "META_ACCESS_TOKEN": "secret serveur — jamais dans git",
+    "META_AD_ACCOUNT_ID": "",
+    "META_PAGE_ID_CHECKWEBS": "",
+    "META_PAGE_ID_LANGUALS": "",
+    "META_WHATSAPP_PHONE_ID": ""
+  },
+  "formats": ["1x1", "9x16"],
+  "webhook_leads": "https://synergieloc.fr/api/v1/agent/decide",
+  "notes": "3 campagnes Meta déjà dans le catalogue Super Admin. Leads → decide, jamais tarif dans l'annonce."
+}

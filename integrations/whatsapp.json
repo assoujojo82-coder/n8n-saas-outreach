@@ -1,0 +1,12 @@
+{
+  "canal": "whatsapp",
+  "api": "cloud",
+  "env": {
+    "WHATSAPP_TOKEN": "secret serveur",
+    "WHATSAPP_PHONE_NUMBER_ID": "",
+    "WHATSAPP_VERIFY_TOKEN": ""
+  },
+  "opt_in_obligatoire": true,
+  "stop_keywords": ["STOP", "stop", "arrêt"],
+  "suite": "decide puis éventuellement email SMTP"
+}

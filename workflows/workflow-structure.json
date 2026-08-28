@@ -1,0 +1,161 @@
+{
+  "id": "demarchage-orchestrateur-01",
+  "name": "Démarchage — Orchestrateur (armée d'agents)",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Pyramide (ne pas inverser)\n1. **Orchestrateur** — ne fait jamais le travail, délègue.\n2. **Think** en fin de chaîne : l'ordre des sous-agents est-il cohérent ?\n3. Sous-agents : Email, CRM, Lead, Campagne, Meta, LinkedIn, WhatsApp, TikTok, X.\n\nPrompts : coller `prompts/*.md` dans chaque AI Agent Tool.\nLes outils appellent Synergieloc (decide + demarchage), pas Gmail.",
+        "height": 280,
+        "width": 420,
+        "color": 5
+      },
+      "id": "note-pyramide",
+      "name": "NOTE — Pyramide",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-280, -40]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "demarchage-orchestrateur",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "wh-orch",
+      "name": "Webhook chat / Super Admin",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 200],
+      "webhookId": "demarchage-orchestrateur"
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first().json;\nconst body = raw.body || raw;\nconst message = String(body.message || body.prompt || body.chatInput || '').trim();\nconst prospect_email = String(body.prospect_email || body.email || '').trim();\nconst campagne = String(body.campagne || '').trim();\nconst cible = String(body.cible || '').trim();\nconst contexte = String(body.contexte || message).trim();\nreturn [{ json: { message, prospect_email, campagne, cible, contexte } }];"
+      },
+      "id": "norm-orch",
+      "name": "Normaliser la demande",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [240, 200]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://synergieloc.fr/api/v1/agent/decide",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "X-Make-Secret", "value": "={{ $env.MAKE_DEMARCHAGE_SECRET }}" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ prospect_email: $json.prospect_email, cible: $json.cible, campagne: $json.campagne, contexte: $json.contexte }) }}",
+        "options": { "timeout": 30000 }
+      },
+      "id": "lead-decide",
+      "name": "Lead Agent — decide",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [500, 80],
+      "notes": "Lead Agent : qualifie. N'invente ni tarif ni CTA."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            {
+              "id": "send-ok",
+              "leftValue": "={{ $json.actions[0].type }}",
+              "rightValue": "envoyer_offre",
+              "operator": { "type": "string", "operation": "equals" }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-offre",
+      "name": "Think — offre autorisée ?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [740, 80]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://synergieloc.fr/api/v1/agent/demarchage",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "X-Make-Secret", "value": "={{ $env.MAKE_DEMARCHAGE_SECRET }}" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ prospect_email: $('Normaliser la demande').item.json.prospect_email, cible: $('Normaliser la demande').item.json.cible, campagne: $json.actions[0].body.campagne || $('Normaliser la demande').item.json.campagne, contexte: $('Normaliser la demande').item.json.contexte }) }}",
+        "options": { "timeout": 30000 }
+      },
+      "id": "email-send",
+      "name": "Email Agent — SMTP offre",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [980, 0],
+      "notes": "Règle Email : n'envoie pas sans adresse. Pas de placeholder. Pas de signature IA."
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ ok: true, think: 'Lead → Email dans cet ordre. Orchestrateur n a rien exécuté lui-même.', decide: $json, email: $json }) }}"
+      },
+      "id": "resp-ok",
+      "name": "Réponse succès",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1220, 0]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ ok: false, think: 'Pas d offre — demander info à l utilisateur (règle orchestrateur).', decide: $json }) }}"
+      },
+      "id": "resp-info",
+      "name": "Réponse demander_info",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [980, 200]
+    }
+  ],
+  "connections": {
+    "Webhook chat / Super Admin": {
+      "main": [[{ "node": "Normaliser la demande", "type": "main", "index": 0 }]]
+    },
+    "Normaliser la demande": {
+      "main": [[{ "node": "Lead Agent — decide", "type": "main", "index": 0 }]]
+    },
+    "Lead Agent — decide": {
+      "main": [[{ "node": "Think — offre autorisée ?", "type": "main", "index": 0 }]]
+    },
+    "Think — offre autorisée ?": {
+      "main": [
+        [{ "node": "Email Agent — SMTP offre", "type": "main", "index": 0 }],
+        [{ "node": "Réponse demander_info", "type": "main", "index": 0 }]
+      ]
+    },
+    "Email Agent — SMTP offre": {
+      "main": [[{ "node": "Réponse succès", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "meta": {
+    "description": "Orchestrateur démarchage : Lead (decide) puis Email (SMTP). L'orchestrateur ne rédige pas l'offre. Importer dans n8n, poser MAKE_DEMARCHAGE_SECRET, activer."
+  }
+}

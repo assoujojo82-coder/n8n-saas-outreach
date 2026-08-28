@@ -1,0 +1,30 @@
+{
+  "name": "Synergieloc — pipeline démarchage",
+  "source_of_truth": "synergieloc.fr Super Admin /admin/demarchage",
+  "airtable_optional": true,
+  "tables": [
+    {
+      "name": "Leads",
+      "fields": [
+        { "name": "email", "type": "email", "required": true },
+        { "name": "nom", "type": "text" },
+        { "name": "marque", "type": "singleSelect", "options": ["checkwebs", "languals", "cao", "synergieloc", "agent_ia"] },
+        { "name": "cible", "type": "singleSelect", "options": ["agent_ia", "architecte", "artisan", "agence_gerance", "checkwebs_tpe", "languals_pro"] },
+        { "name": "canal", "type": "singleSelect", "options": ["email", "meta", "linkedin", "whatsapp", "tiktok", "x"] },
+        { "name": "statut", "type": "singleSelect", "options": ["nouveau", "qualifie", "offre_envoyee", "stop", "bounce"] },
+        { "name": "stop", "type": "checkbox" },
+        { "name": "contexte", "type": "longText" },
+        { "name": "job_id", "type": "text" },
+        { "name": "created_at", "type": "dateTime" }
+      ]
+    },
+    {
+      "name": "STOP",
+      "fields": [
+        { "name": "email", "type": "email", "required": true },
+        { "name": "motif", "type": "singleSelect", "options": ["opt_out", "bounce", "plainte"] },
+        { "name": "ajoute_le", "type": "dateTime" }
+      ]
+    }
+  ]
+}
